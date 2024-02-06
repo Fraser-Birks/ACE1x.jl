@@ -50,6 +50,7 @@ const _kw_defaults = Dict(:elements => nothing,
                           :pure2b => true,
                           :delete2b => true,
                           :pure => false,
+                          :only_mb_basis => false,
                           #
                           :pair_rin => :rin,
                           :pair_rcut => :rcut,
@@ -341,10 +342,18 @@ function mb_ace_basis(kwargs)
 end
 
 function ace_basis(; kwargs...)
-   kwargs = _clean_args(kwargs)
-   rpiB = mb_ace_basis(kwargs)
-   pairB = _pair_basis(kwargs)
-   return JuLIP.MLIPs.IPSuperBasis([pairB, rpiB]);
+   only_mb_basis = kwargs[:only_mb_basis]
+   if only_mb_basis
+      @info("Using only manybody basis!")
+      kwargs = _clean_args(kwargs)
+      rpiB = mb_ace_basis(kwargs)
+      return JuLIP.MLIPs.IPSuperBasis([rpiB])
+   else
+      kwargs = _clean_args(kwargs)
+      rpiB = mb_ace_basis(kwargs)
+      pairB = _pair_basis(kwargs)
+      return JuLIP.MLIPs.IPSuperBasis([pairB, rpiB])
+   end
 end
 
 
